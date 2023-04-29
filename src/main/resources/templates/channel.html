@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <script th:inline="javascript">
+        const user = sessionStorage.getItem('user');
+        if (!user) {
+            window.location = /*[[@{/}]]*/ '';
+        }
+        setInterval(function() {
+            fetch(window.location.href + '/load')
+                .then(response => response.json())
+                .then(data => {
+                    // Update the HTML elements with the new channel informationconst messageDiv = document.querySelector('div#message-div');
+                    const messageDiv = document.querySelector('div#message-div');
+                    // Remove all the existing message elements
+                    messageDiv.innerHTML = '';
+                    // Create new span elements for each message and append them to the div
+                    data.messages.forEach(message => {
+                        const div = document.createElement('div');
+                        div.innerHTML = `${message.username}: ${message.sentence}`;
+                        messageDiv.appendChild(div);
+                    });
+                })
+                .catch(error => console.error(error));
+        }, 100); // make the request every 1000 milliseconds (1 second)
+    </script>
+</head>
+<body>
+    <h1 id="channel-name" th:text="${channel.channelName}"></h1>
+    <div id="message-div" style="border: 1px solid black;">
+        <div th:each="message : ${channel.messages}">
+            <span th:text="${message.username} + ': ' + ${message.sentence}" class="message"></span>
+        </div>
+    </div>
+    <div >
+        <input type="text" id="input" placeholder="Enter text here" size="40" onkeydown="if (event.keyCode === 13) { sendData(); }">
+        <button onclick="sendData()">Submit</button>
+    </div>
+
+    <script>
+        function sendData() {
+            const messageInput = document.getElementById('input');
+            let data = document.getElementById("input").value;
+            if (data === "") {
+                alert("You didn't write anything")
+                return
+            }
+            var user = sessionStorage.getItem('user')
+            var parsedUser = JSON.parse(user)
+            var username = parsedUser.name
+
+            var message = {
+                username: username,
+                sentence: data
+            }
+            fetch(window.location.href, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(message)})
+                messageInput.value = '';
+                messageInput.focus();
+        }
+    </script>
+</body>
+
+
+</html>
