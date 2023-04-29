@@ -18,7 +18,7 @@
                     // Create new span elements for each message and append them to the div
                     data.messages.forEach(message => {
                         const div = document.createElement('div');
-                        div.innerHTML = `${message.username}: ${message.sentence}`;
+                        div.innerHTML = '<b>' + message.username +'</b>: ' + message.sentence
                         messageDiv.appendChild(div);
                     });
                 })
@@ -30,7 +30,7 @@
     <h1 id="channel-name" th:text="${channel.channelName}"></h1>
     <div id="message-div" style="border: 1px solid black;">
         <div th:each="message : ${channel.messages}">
-            <span th:text="${message.username} + ': ' + ${message.sentence}" class="message"></span>
+            <span th:utext="'<b>' + ${message.username} + '</b>' + ': ' + ${message.sentence}" class="message"></span>
         </div>
     </div>
     <div >
